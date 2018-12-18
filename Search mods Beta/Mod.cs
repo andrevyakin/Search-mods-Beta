@@ -60,8 +60,8 @@ namespace Search_mods_Beta
                         if (string.Compare(fileSkyrim, fileNexus.Substring(fileNexus.Length - fileSkyrim.Length), StringComparison.OrdinalIgnoreCase) == 0)
                         {
 
-                            //if (temp.Contains(fileSkyrim)) continue;
-                            //temp.Add(fileSkyrim);
+                            if (temp.Contains(fileSkyrim)) continue;
+                            temp.Add(fileSkyrim);
 
                             if (!result.ContainsKey(modNexus.Key))
                                 result.Add(modNexus.Key, new List<string> { fileSkyrim });
@@ -119,12 +119,11 @@ namespace Search_mods_Beta
                             szc.CompressFileDictionary(temp, fs);
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    StreamWriter file = new StreamWriter(Path.Combine(PathResult, "Повторяющиеся файлы.txt"), true);
-                    file.WriteLine(mod.Key);
+                    StreamWriter file = new StreamWriter(Path.Combine(PathResult, "Ошибки при архивировании.txt"), true);
+                    file.WriteLine(e);
                     file.Close();
-
                 }
                 
             }
