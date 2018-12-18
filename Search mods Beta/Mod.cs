@@ -1,6 +1,7 @@
 ﻿using SevenZip;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,7 @@ namespace Search_mods_Beta
 
         public static void InitializeSkyrim()
         {
-            skyrim = FilesDir.Get(PathSkyrim);           
+            skyrim = FilesDir.Get(PathSkyrim);
         }
 
         public static void InitializeNexus()
@@ -34,7 +35,7 @@ namespace Search_mods_Beta
             {
                 List<string> currentArch = FilesArch.Get(Path.Combine(PathNexus, item));
 
-                nexus.Add(item, currentArch);
+                nexus.Add(item.Remove(item.LastIndexOf('.')), currentArch);
 
                 countNexus += currentArch.Count;
             }            
@@ -51,21 +52,22 @@ namespace Search_mods_Beta
                 foreach (var modNexus in nexus)
                 {
                     List<string> temp = new List<string>();
-
+                   
                     foreach (var fileNexus in modNexus.Value)
                     {
                         if (fileSkyrim.Length > fileNexus.Length) continue;
-                                               
-                        if (string.Compare(fileSkyrim, fileNexus.Substring(fileNexus.Length - fileSkyrim.Length)) == 0)
+                        
+                        if (string.Compare(fileSkyrim, fileNexus.Substring(fileNexus.Length - fileSkyrim.Length), StringComparison.OrdinalIgnoreCase) == 0)
                         {
 
-                            if (temp.Contains(fileSkyrim)) continue;
-                            temp.Add(fileSkyrim);
+                            //if (temp.Contains(fileSkyrim)) continue;
+                            //temp.Add(fileSkyrim);
 
                             if (!result.ContainsKey(modNexus.Key))
                                 result.Add(modNexus.Key, new List<string> { fileSkyrim });
                             else
                                 result[modNexus.Key].Add(fileSkyrim);
+
                             flag = true;
                         }
                     }
@@ -76,6 +78,10 @@ namespace Search_mods_Beta
                     else
                         result["Not found"].Add(fileSkyrim);
             }
+
+            Console.WriteLine($"Файлов в сборке: {skyrim.Count}");
+            Console.WriteLine($"Файлов в исходниках: {countNexus}");
+            Console.WriteLine($"Не найдено: {result["Not found"].Count}");
         }
 
         public static void Create(string postfix = null)
@@ -86,29 +92,41 @@ namespace Search_mods_Beta
 
             foreach (var mod in result)
             {
+                //if(mod.Key != "Not found") continue;
+
                 if (!Directory.Exists(Path.GetDirectoryName(Path.Combine(PathResult, mod.Key)) ?? throw new InvalidOperationException()))
                     Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(PathResult, mod.Key)) ?? throw new InvalidOperationException());
-
-                using (FileStream fs = new FileStream(string.Concat(PathResult, '\\', mod.Key, postfix ?? string.Empty, ".7z"), FileMode.Create))
+                try
                 {
-                    SevenZipCompressor szc = new SevenZipCompressor
+                    using (FileStream fs = new FileStream(string.Concat(PathResult, '\\', mod.Key, postfix ?? string.Empty, ".7z"), FileMode.Create))
                     {
-                        CompressionMethod = CompressionMethod.Lzma,
-                        CompressionLevel = CompressionLevel.Normal,
-                        CompressionMode = CompressionMode.Create,
-                        DirectoryStructure = true,
-                        PreserveDirectoryRoot = false,
-                        ArchiveFormat = OutArchiveFormat.SevenZip
-                    };
-                    
-                    Dictionary<string, string> temp = new Dictionary<string, string>();
+                        SevenZipCompressor szc = new SevenZipCompressor
+                        {
+                            CompressionMethod = CompressionMethod.Lzma2,
+                            CompressionLevel = CompressionLevel.Normal,
+                            CompressionMode = CompressionMode.Create,
+                            DirectoryStructure = true,
+                            PreserveDirectoryRoot = false,
+                            ArchiveFormat = OutArchiveFormat.SevenZip
+                        };
 
-                    foreach (var item in mod.Value)                    
-                        temp.Add(item, Path.Combine(PathSkyrim, item));
-                    
+                        Dictionary<string, string> temp = new Dictionary<string, string>();
 
-                    szc.CompressFileDictionary(temp, fs);
+                        foreach (var item in mod.Value)
+                            temp.Add(item, Path.Combine(PathSkyrim, item));
+
+                        if (fs != null)
+                            szc.CompressFileDictionary(temp, fs);
+                    }
                 }
+                catch (Exception)
+                {
+                    StreamWriter file = new StreamWriter(Path.Combine(PathResult, "Повторяющиеся файлы.txt"), true);
+                    file.WriteLine(mod.Key);
+                    file.Close();
+
+                }
+                
             }
         }
 
@@ -117,16 +135,16 @@ namespace Search_mods_Beta
             int count = 0;
             foreach (var mod in !flag ? result : nexus)
             {
-                Console.WriteLine(string.Format($"\nИмя мода: {mod.Key}\n") + new string('-', 40));
+                Console.WriteLine(string.Format($"\nИмя мода: {mod.Key}\nФайлы в моде:\n") + new string('-', 40));
 
                 foreach (var file in mod.Value)
                 {
-                    Console.WriteLine($"Файлы в моде: {file}");
+                    Console.WriteLine(file);
                     if (++count % 10 == 0)
                     {
                         if (Console.ReadKey().Key == ConsoleKey.Enter)
                             break;
-                        Console.WriteLine(string.Format($"\nИмя мода: {mod.Key}\n") + new string('-', 40));
+                        Console.WriteLine(string.Format($"\nИмя мода: {mod.Key}\nФайлы в моде:\n") + new string('-', 40));
                     }
                 }
             }
