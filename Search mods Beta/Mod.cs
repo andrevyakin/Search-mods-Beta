@@ -35,8 +35,13 @@ namespace Search_mods_Beta
             {
                 List<string> currentArch = FilesArch.Get(Path.Combine(PathNexus, item));
 
-                nexus.Add(item.Remove(item.LastIndexOf('.')), currentArch);
-
+                if (!nexus.ContainsKey(item.Remove(item.LastIndexOf('.'))))
+                    nexus.Add(item.Remove(item.LastIndexOf('.')), currentArch);
+                else                
+                    foreach (var file in currentArch)                    
+                        if (!nexus[item.Remove(item.LastIndexOf('.'))].Contains(file))
+                            nexus[item.Remove(item.LastIndexOf('.'))].Add(file);                  
+                
                 countNexus += currentArch.Count;
             }            
         }

@@ -11,16 +11,16 @@ namespace Search_mods_Beta
         static void Main(string[] args)
         {
             #region На рабое
-            //Mod.PathSkyrim = @"D:\Skyrim LE\Skyrim - Requiem for a Dream v3.6.2\Requiem for a Dream XP v3.6.2\Data";
-            //Mod.PathNexus = @"D:\Skyrim LE\Mods";
-            //Mod.PathResult = @"D:\Skyrim LE\Reqiem for s Dream Result";
+            Mod.PathSkyrim = @"D:\Skyrim LE\Skyrim - Requiem for a Dream v3.6.2\Requiem for a Dream XP v3.6.2\Data";
+            Mod.PathNexus = @"D:\Skyrim LE\Mods";
+            Mod.PathResult = @"D:\Skyrim LE\Reqiem for s Dream Result";
             #endregion
 
             #region Дома
 
-            Mod.PathSkyrim = @"E:\Games\Skyrim - Requiem for a Dream v4.0\Requiem for a Dream XP v4.0\Data";
-            Mod.PathNexus = @"E:\MySkyrimLE\Source Requiem for a Dream";
-            Mod.PathResult = @"E:\MySkyrimLE\Sourse for MO Xaxdr";
+            //Mod.PathSkyrim = @"E:\Games\Skyrim - Requiem for a Dream v4.0\Requiem for a Dream XP v4.0\Data";
+            //Mod.PathNexus = @"E:\MySkyrimLE\Source Requiem for a Dream";
+            //Mod.PathResult = @"E:\MySkyrimLE\Sourse for MO Xaxdr";
 
             #endregion
 
@@ -32,9 +32,9 @@ namespace Search_mods_Beta
 
             Mod.InitializeResult();
 
-           // Mod.Display(true);
+            Mod.Display(true);
 
-           Mod.Create(" (Xandr)");
+          // Mod.Create(" (Xandr)");
         }
     }
 }
